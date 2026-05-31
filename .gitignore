@@ -1,0 +1,11 @@
+# MT4 tester artifacts / logs
+*.log
+tester/
+# Cloudflare / node
+node_modules/
+.wrangler/
+.dev.vars
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store

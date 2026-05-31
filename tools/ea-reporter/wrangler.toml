@@ -1,0 +1,19 @@
+name = "ea-reporter"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[[kv_namespaces]]
+binding = "EA_RESULTS"
+id = "beca3fc85b784d3fbd076771bf387a0c"
+
+[vars]
+TO_EMAIL = "ahmed.alaaeldin@icloud.com"
+FROM_EMAIL = "noreply@traderscastle.com"
+FROM_NAME = "Traders Castle"
+
+[[send_email]]
+name = "SEND_EMAIL"
+
+[[routes]]
+pattern = "www.zargina.com/api/ea-report"
+zone_name = "zargina.com"
