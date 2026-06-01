@@ -36,7 +36,7 @@
 //|   Buy & Sell EA v491 - Partial_Pct=0.15 (sweep: 0.20->0.15)+------------------------------------------------------------------+
 #property copyright ""
 #property link      ""
-#property version   "510.0"  // v510: v509 high-risk halving + RE-ENABLE DD_Budget governor (100->4.5) to cap DD ~5%
+#property version   "510.0"  // v510: ADD drawdown governor into GetRiskScale (combine with halving via min) so DD_Budget=4.5 actually caps DD ~5%
 #property strict
 
 #include <stdlib.mqh>
@@ -139,8 +139,16 @@ void OnDeinit(const int reason) {}
 //|   Buy & Sell EA v491 - Partial_Pct=0.15 (sweep: 0.20->0.15)+------------------------------------------------------------------+
 double GetRiskScale()
 {
-   // v509: use in-memory counter (history ordering in backtest is unreliable)
-   double scale = MathPow(0.5, g_ConsecLosses);
+   // v509 halving: 0.5^consecutive-losses (in-memory counter).
+   double halveScale = MathPow(0.5, g_ConsecLosses);
+   // v510: ADD a real drawdown governor so DD is actually capped near DD_Budget.
+   // (v507 had disabled this; the DD_Budget input was dead. Now it bites again.)
+   double curBalance = AccountBalance();
+   if(curBalance > g_PeakBalance) g_PeakBalance = curBalance;
+   double ddPct = (g_PeakBalance > 0) ? (g_PeakBalance - curBalance) / g_PeakBalance * 100.0 : 0;
+   double ddScale = (Risk_Pct > 0) ? (DD_Budget - ddPct) / Risk_Pct : 1.0;
+   // Take the MORE conservative of the two throttles.
+   double scale = MathMin(halveScale, ddScale);
    return MathMax(Min_Scale, MathMin(1.0, scale));
 }
 
